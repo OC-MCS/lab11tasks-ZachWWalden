@@ -8,7 +8,7 @@ using namespace std;
 // value pased into num, to the end of the list.   *
 //**************************************************
 
-void NumberList::appendNode(double num)
+void NumberList::appendNode(int num)
 {
 	ListNode *newNode;  // To point to a new node
 	ListNode *nodePtr;  // To move through the list
@@ -21,18 +21,14 @@ void NumberList::appendNode(double num)
 	// If there are no nodes in the list
 	// make newNode the first node.
 	if (!head)
+	{
 		head = newNode;
+		tail = newNode;
+	}
 	else  // Otherwise, insert newNode at end.
 	{
-		// Initialize nodePtr to head of list.
-		nodePtr = head;
-
-		// Find the last node in the list.
-		while (nodePtr->next)
-			nodePtr = nodePtr->next;
-
-		// Insert newNode as the last node.
-		nodePtr->next = newNode;
+		tail->next = newNode;
+		tail = newNode;
 	}
 }
 
@@ -61,12 +57,14 @@ void NumberList::displayList() const
 	}
 }
 
+
+
 //**************************************************
 // The insertNode function inserts a node with     *
 // num copied to its value member.                 *
 //**************************************************
 
-void NumberList::insertNode(double num)
+void NumberList::insertNode(int num)
 {
 	ListNode *newNode;					// A new node
 	ListNode *nodePtr;					// To traverse the list
@@ -81,6 +79,7 @@ void NumberList::insertNode(double num)
 	if (!head)
 	{
 		head = newNode;
+		tail = newNode;
 		newNode->next = nullptr;
 	}
 	else  // Otherwise, insert newNode
@@ -110,6 +109,8 @@ void NumberList::insertNode(double num)
 			previousNode->next = newNode;
 			newNode->next = nodePtr;
 		}
+		if (!nodePtr)
+			tail = newNode;
 	}
 }
 
@@ -119,7 +120,7 @@ void NumberList::insertNode(double num)
 // deleted from the list and from memory.          *
 //**************************************************
 
-void NumberList::deleteNode(double num)
+void NumberList::deleteNode(int num)
 {
 	ListNode *nodePtr;       // To traverse the list
 	ListNode *previousNode = nullptr;  // To point to the previous node
@@ -156,14 +157,74 @@ void NumberList::deleteNode(double num)
 			previousNode->next = nodePtr->next;
 			delete nodePtr;
 		}
+		if (!previousNode->next)
+			tail = previousNode;
 	}
+}
+
+NumberList::NumberList(NumberList & listOne)
+{
+	if (listOne.head)
+	{
+		ListNode* listOneNodePtr = listOne.head;
+
+		//allocate first node
+		ListNode* newNode = new ListNode;
+		head = newNode;
+		head->value = listOneNodePtr->value;
+		ListNode* nodePtr = head;
+		listOneNodePtr = listOneNodePtr->next;
+		//allocate the rest of the list
+		while (listOneNodePtr)
+		{
+			newNode = new ListNode;
+			newNode->value = listOneNodePtr->value;
+			nodePtr->next = newNode;
+			listOneNodePtr = listOneNodePtr->next;		
+			nodePtr = newNode;
+		}
+		nodePtr->next = nullptr;
+		tail = nodePtr;
+	}
+}
+
+NumberList NumberList::operator=(NumberList & listOne)
+{
+	if (this != &listOne)
+	{
+		this->~NumberList();
+
+		if (listOne.head)
+		{
+			ListNode* listOneNodePtr = listOne.head;
+
+			//allocate first node
+			ListNode* newNode = new ListNode;
+			head = newNode;
+			head->value = listOneNodePtr->value;
+			ListNode* nodePtr = head;
+			listOneNodePtr = listOneNodePtr->next;
+			//allocate the rest of the list
+			while (listOneNodePtr)
+			{
+				newNode = new ListNode;
+				newNode->value = listOneNodePtr->value;
+				nodePtr->next = newNode;
+				listOneNodePtr = listOneNodePtr->next;
+				nodePtr = newNode;
+			}
+			nodePtr->next = nullptr;
+			tail = nodePtr;
+		}
+	}
+
+	return *this;
 }
 
 //**************************************************
 // Destructor                                      *
 // This function deletes every node in the list.   *
 //**************************************************
-
 NumberList::~NumberList()
 {
 	ListNode *nodePtr;   // To traverse the list
